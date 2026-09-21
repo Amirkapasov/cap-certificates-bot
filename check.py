@@ -30,8 +30,15 @@ def main():
     cfg = cert_bot.CFG
     missing = [t['file'] for t in cfg['templates'].values() if not os.path.exists(t['file'])]
     report(not missing, f'шаблоны ({len(cfg["templates"])})', ', '.join(missing))
-    bad_fonts = [f['path'] for f in cfg['fonts'].values() if not os.path.exists(f['path'])]
-    report(not bad_fonts, 'шрифты', ', '.join(bad_fonts))
+    import render
+    bad_fonts, used = [], []
+    for key, spec in cfg['fonts'].items():
+        try:
+            path, _ = render._font_file(spec)
+            used.append(os.path.basename(path))
+        except FileNotFoundError:
+            bad_fonts.append(spec['path'])
+    report(not bad_fonts, 'шрифты', ', '.join(bad_fonts or used))
 
     print('\n— Telegram —')
     try:

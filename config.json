@@ -2,11 +2,21 @@
   "fonts": {
     "name": {
       "path": "/System/Library/Fonts/HelveticaNeue.ttc",
-      "index": 1
+      "index": 1,
+      "fallbacks": [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf"
+      ]
     },
     "small": {
       "path": "/System/Library/Fonts/Avenir Next.ttc",
-      "index": 7
+      "index": 7,
+      "fallbacks": [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf"
+      ]
     }
   },
   "templates": {

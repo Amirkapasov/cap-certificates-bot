@@ -49,6 +49,7 @@ requirements.txt      зависимости
 email_templates.json  тексты писем (ru/kz/en) и списки курсов для скидки
 apps_script.gs        запасной бэкенд для таблицы, если OAuth недоступен
                       (перед установкой подставить секрет из APPS_SCRIPT_SECRET)
+deploy/               юнит systemd для сервера
 templates/            чистые PNG-шаблоны 2000×1425 (казахская благодарность 2000×1414)
 out/                  готовые файлы и QR (создаётся автоматически)
 issued.csv            журнал выдач: код, ФИО, курс, дата
@@ -263,6 +264,50 @@ caffeinate -i .venv/bin/python cert_bot.py
 - В CRM выполняется только чтение — карточки бот не изменяет.
 - Письмо уходит после подтверждения в интерфейсе, автоматических рассылок нет.
 - `CERT_ADMINS` ограничивает круг тех, кто может выдавать документы.
+
+---
+
+## Развёртывание на сервере
+
+Бот должен работать **в одном экземпляре**: Telegram не отдаёт обновления двум
+процессам сразу. Перед запуском на сервере остановите локальный (`pkill -f cert_bot.py`).
+
+```bash
+sudo useradd -r -m -d /opt/cap-certificates-bot capbot
+sudo -u capbot git clone https://github.com/Amirkapasov/cap-certificates-bot.git /opt/cap-certificates-bot
+cd /opt/cap-certificates-bot
+sudo -u capbot python3 -m venv .venv
+sudo -u capbot .venv/bin/pip install -r requirements.txt
+sudo apt install fonts-dejavu-core        # шрифты с кириллицей и казахскими буквами
+```
+
+Скопировать с рабочей машины (в репозитории их нет):
+
+```bash
+scp .env credentials.json token.json server:/opt/cap-certificates-bot/
+```
+
+`token.json` переносится как есть — заново входить в Google на сервере не нужно,
+браузер там не понадобится. Затем проверка и автозапуск:
+
+```bash
+sudo -u capbot .venv/bin/python check.py
+sudo cp deploy/cap-cert-bot.service /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now cap-cert-bot
+systemctl status cap-cert-bot
+tail -f /var/log/cap-cert-bot.log
+```
+
+Обновление версии:
+
+```bash
+cd /opt/cap-certificates-bot && sudo -u capbot git pull
+sudo systemctl restart cap-cert-bot
+```
+
+Шрифты: в `config.json` у каждого шрифта есть `fallbacks` — на macOS берутся
+системные Helvetica Neue и Avenir, на Linux DejaVu Sans. Начертание отличается
+от макета Canva, поэтому после первого запуска стоит сверить сертификат глазами.
 
 ---
 

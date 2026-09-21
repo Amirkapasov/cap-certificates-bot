@@ -1,0 +1,20 @@
+# Автозапуск бота. Установка:
+#   sudo cp deploy/cap-cert-bot.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now cap-cert-bot
+[Unit]
+Description=CAP Education certificates bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=capbot
+WorkingDirectory=/opt/cap-certificates-bot
+ExecStart=/opt/cap-certificates-bot/.venv/bin/python -u cert_bot.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/cap-cert-bot.log
+StandardError=append:/var/log/cap-cert-bot.log
+
+[Install]
+WantedBy=multi-user.target

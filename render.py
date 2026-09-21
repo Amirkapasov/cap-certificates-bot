@@ -14,9 +14,26 @@ def load_config():
         return json.load(f)
 
 
+_font_cache = {}
+
+
+def _font_file(spec):
+    """Путь к шрифту: основной (macOS) или первый доступный запасной (Linux-сервер)."""
+    key = spec['path']
+    if key in _font_cache:
+        return _font_cache[key]
+    for path, index in [(spec['path'], spec.get('index', 0))] + \
+                       [(p, 0) for p in spec.get('fallbacks', [])]:
+        if os.path.exists(path):
+            _font_cache[key] = (path, index)
+            return _font_cache[key]
+    raise FileNotFoundError(
+        f'не найден шрифт {spec["path"]} и запасные варианты {spec.get("fallbacks", [])}')
+
+
 def _font(cfg, name, px):
-    spec = cfg['fonts'][name]
-    return ImageFont.truetype(spec['path'], px, index=spec.get('index', 0))
+    path, index = _font_file(cfg['fonts'][name])
+    return ImageFont.truetype(path, px, index=index)
 
 
 def _fit(draw, text, cfg, font_name, px, max_px):
