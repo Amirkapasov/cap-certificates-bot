@@ -1,0 +1,18 @@
+# секреты
+.env
+credentials.json
+token.json
+
+# данные и результаты
+out/
+issued.csv
+emails.csv
+bot.log
+journal.db
+
+# окружение и среда разработки
+.venv/
+__pycache__/
+*.pyc
+.idea/
+.DS_Store

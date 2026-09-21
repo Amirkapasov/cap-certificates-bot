@@ -1,0 +1,401 @@
+{
+  "fonts": {
+    "name": {
+      "path": "/System/Library/Fonts/HelveticaNeue.ttc",
+      "index": 1
+    },
+    "small": {
+      "path": "/System/Library/Fonts/Avenir Next.ttc",
+      "index": 7
+    }
+  },
+  "templates": {
+    "blago": {
+      "title": "🙏 Благодарность родителю",
+      "file": "templates/blagodarnost.png",
+      "kind": "blago",
+      "ask": "Введите ФИО родителя (можно списком)",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.4995,
+          "y": 0.5418,
+          "size": 0.0702,
+          "color": "#FFFAC0",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "date": {
+          "font": "small",
+          "x": 0.804,
+          "y": 0.8793,
+          "size": 0.0237,
+          "color": "#FDFDFE",
+          "align": "center"
+        }
+      },
+      "lang": "ru"
+    },
+    "blago_kz": {
+      "title": "🙏 Алғыс хат (каз)",
+      "file": "templates/blagodarnost_kz.png",
+      "kind": "blago",
+      "ask": "Ата-ананың аты-жөні / ФИО родителя (можно списком)",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.496,
+          "y": 0.5417,
+          "size": 0.0707,
+          "color": "#FFFAC0",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "date": {
+          "font": "small",
+          "x": 0.804,
+          "y": 0.8791,
+          "size": 0.0239,
+          "color": "#FDFDFE",
+          "align": "center"
+        }
+      },
+      "lang": "kz"
+    },
+    "python": {
+      "title": "🐍 Python",
+      "file": "templates/sert_python.png",
+      "course": "Python",
+      "kind": "sert",
+      "ask": "ФИО ученика / ФИО родителя",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.4995,
+          "y": 0.5305,
+          "size": 0.0702,
+          "color": "#FCF98D",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "qr": {
+          "type": "image",
+          "box": [
+            0.609,
+            0.8175438596491228,
+            0.6865,
+            0.9256140350877193
+          ]
+        },
+        "number": {
+          "font": "small",
+          "x": 0.706,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left",
+          "prefix": "№ "
+        },
+        "date": {
+          "font": "small",
+          "x": 0.849,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left"
+        }
+      },
+      "letter": "blago",
+      "lang": "ru"
+    },
+    "python_en": {
+      "title": "🇬🇧 Python (англ)",
+      "file": "templates/sert_python_en.png",
+      "course": "Python англ",
+      "kind": "sert",
+      "ask": "Введите ФИО ученика (можно списком, каждое с новой строки)",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.5,
+          "y": 0.5635,
+          "size": 0.0722,
+          "color": "#FCF98D",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "qr": {
+          "type": "image",
+          "box": [
+            0.609,
+            0.8175438596491228,
+            0.6865,
+            0.9256140350877193
+          ]
+        },
+        "number": {
+          "font": "small",
+          "x": 0.706,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left",
+          "prefix": "№ "
+        },
+        "date": {
+          "font": "small",
+          "x": 0.849,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left"
+        }
+      },
+      "letter": "blago",
+      "lang": "en"
+    },
+    "web": {
+      "title": "🌐 Web-разработка",
+      "file": "templates/sert_web.png",
+      "course": "WEB",
+      "kind": "sert",
+      "ask": "ФИО ученика / ФИО родителя",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.4995,
+          "y": 0.5305,
+          "size": 0.0702,
+          "color": "#FCF98D",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "qr": {
+          "type": "image",
+          "box": [
+            0.609,
+            0.8175438596491228,
+            0.6865,
+            0.9256140350877193
+          ]
+        },
+        "number": {
+          "font": "small",
+          "x": 0.706,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left",
+          "prefix": "№ "
+        },
+        "date": {
+          "font": "small",
+          "x": 0.849,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left"
+        }
+      },
+      "letter": "blago",
+      "lang": "ru"
+    },
+    "web_en": {
+      "title": "🇬🇧 Web Development (англ)",
+      "file": "templates/sert_web_en.png",
+      "course": "WEB англ",
+      "kind": "sert",
+      "ask": "Введите ФИО ученика (можно списком, каждое с новой строки)",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.5,
+          "y": 0.5635,
+          "size": 0.0722,
+          "color": "#FCF98D",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "qr": {
+          "type": "image",
+          "box": [
+            0.609,
+            0.8175438596491228,
+            0.6865,
+            0.9256140350877193
+          ]
+        },
+        "number": {
+          "font": "small",
+          "x": 0.706,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left",
+          "prefix": "№ "
+        },
+        "date": {
+          "font": "small",
+          "x": 0.849,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left"
+        }
+      },
+      "letter": "blago",
+      "lang": "en"
+    },
+    "ai": {
+      "title": "🤖 Искусственный интеллект",
+      "file": "templates/sert_ai.png",
+      "course": "ИИ",
+      "kind": "sert",
+      "ask": "Введите ФИО ученика (можно списком, каждое с новой строки)",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.4995,
+          "y": 0.5305,
+          "size": 0.0702,
+          "color": "#FCF98D",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "qr": {
+          "type": "image",
+          "box": [
+            0.609,
+            0.8175438596491228,
+            0.6865,
+            0.9256140350877193
+          ]
+        },
+        "number": {
+          "font": "small",
+          "x": 0.706,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left",
+          "prefix": "№ "
+        },
+        "date": {
+          "font": "small",
+          "x": 0.849,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left"
+        }
+      },
+      "bonus": true,
+      "lang": "ru"
+    },
+    "compgram": {
+      "title": "💻 Компьютерная грамотность",
+      "file": "templates/sert_compgram.png",
+      "course": "Компьютерная грамотность",
+      "kind": "sert",
+      "ask": "Введите ФИО ученика (можно списком, каждое с новой строки)",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.4995,
+          "y": 0.5305,
+          "size": 0.0702,
+          "color": "#FCF98D",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "qr": {
+          "type": "image",
+          "box": [
+            0.609,
+            0.8175438596491228,
+            0.6865,
+            0.9256140350877193
+          ]
+        },
+        "number": {
+          "font": "small",
+          "x": 0.706,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left",
+          "prefix": "№ "
+        },
+        "date": {
+          "font": "small",
+          "x": 0.849,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left"
+        }
+      },
+      "bonus": true,
+      "lang": "ru"
+    },
+    "mobilo": {
+      "title": "📱 Мобилография",
+      "file": "templates/sert_mobilo.png",
+      "course": "Мобилография",
+      "kind": "sert",
+      "ask": "Введите ФИО ученика (можно списком, каждое с новой строки)",
+      "fields": {
+        "name": {
+          "font": "name",
+          "x": 0.4995,
+          "y": 0.5305,
+          "size": 0.0702,
+          "color": "#FCF98D",
+          "align": "center",
+          "max_width": 0.7
+        },
+        "qr": {
+          "type": "image",
+          "box": [
+            0.609,
+            0.8175438596491228,
+            0.6865,
+            0.9256140350877193
+          ]
+        },
+        "number": {
+          "font": "small",
+          "x": 0.706,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left",
+          "prefix": "№ "
+        },
+        "date": {
+          "font": "small",
+          "x": 0.849,
+          "y": 0.8786,
+          "size": 0.0217,
+          "color": "#FDFDFE",
+          "align": "left"
+        }
+      },
+      "bonus": true,
+      "lang": "ru"
+    }
+  },
+  "mentors_hidden": [
+    "Амир",
+    "Амир К",
+    "Арыстан",
+    "Сара",
+    "Кобыланды",
+    "Тамерлан",
+    "Арсен",
+    "Алтынай К",
+    "Аскар",
+    "Дария",
+    "София"
+  ]
+}

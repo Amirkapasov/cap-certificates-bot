@@ -1,0 +1,48 @@
+{
+  "ru": {
+    "subject": "🎓 Поздравляем! Сертификат {student} — CAP Education",
+    "body": "Здравствуйте! 👋\n\nПоздравляем! 🎉 {student} успешно завершил(а) курс «{course}» в CAP Education. Мы гордимся результатом и рады были учить вашего ребёнка. 💙\n\n📎 Во вложении:\n{attachments}\n\n🔍 Подлинность сертификата можно проверить по ссылке:\n{links}\n\n🎁 Для выпускников — скидка 30% на следующий курс: {next_courses}. Напишите нам, и мы подберём направление. 🚀\n\nСпасибо за доверие к нашей школе! ✨\n\nС уважением,\nкоманда CAP Education\ncapedu.kz"
+  },
+  "kz": {
+    "subject": "🎓 Құттықтаймыз! {student} сертификаты — CAP Education",
+    "body": "Сәлеметсіз бе! 👋\n\nҚұттықтаймыз! 🎉 {student} CAP Education мектебінде «{course}» курсын сәтті аяқтады. Нәтижесі үшін мақтан тұтамыз, балаңызды оқыту біз үшін қуаныш болды. 💙\n\n📎 Тіркемеде:\n{attachments}\n\n🔍 Сертификаттың түпнұсқалығын мына сілтеме арқылы тексере аласыз:\n{links}\n\n🎁 Түлектерімізге келесі курсқа 30% жеңілдік: {next_courses}. Бізге жазыңыз, бағытты бірге таңдаймыз. 🚀\n\nМектебімізге сенім артқаныңыз үшін рахмет! ✨\n\nҚұрметпен,\nCAP Education командасы\ncapedu.kz"
+  },
+  "en": {
+    "subject": "🎓 Congratulations! {student}'s certificate — CAP Education",
+    "body": "Hello! 👋\n\nCongratulations! 🎉 {student} has successfully completed the \"{course}\" course at CAP Education. We are proud of the result and were glad to teach your child. 💙\n\n📎 Attached:\n{attachments}\n\n🔍 You can verify the certificate here:\n{links}\n\n🎁 Graduates get a 30% discount on the next course: {next_courses}. Just write to us and we will help you choose. 🚀\n\nThank you for trusting our school! ✨\n\nBest regards,\nCAP Education team\ncapedu.kz"
+  },
+  "labels": {
+    "ru": {
+      "sert": "🏅 сертификат по курсу «{course}»",
+      "blago": "💌 благодарственное письмо родителю"
+    },
+    "kz": {
+      "sert": "🏅 «{course}» курсы бойынша сертификат",
+      "blago": "💌 ата-анаға алғыс хат"
+    },
+    "en": {
+      "sert": "🏅 certificate for the \"{course}\" course",
+      "blago": "💌 letter of gratitude for the parent"
+    }
+  },
+  "next_courses": [
+    "Frontend",
+    "Backend",
+    "CS50",
+    "Mobile",
+    "Web"
+  ],
+  "next_courses_by_course": {
+    "web": [
+      "Backend",
+      "CS50",
+      "Mobile"
+    ],
+    "python": [
+      "Frontend",
+      "Backend",
+      "CS50",
+      "Mobile"
+    ]
+  }
+}
