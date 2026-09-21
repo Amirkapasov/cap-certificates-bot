@@ -9,6 +9,7 @@
          F Выпускной ✓ | G Курс | H Дата | I Статус | J QR | K Проверить | L Благодарность ✓
 """
 import os
+import threading
 
 import requests
 
@@ -21,6 +22,7 @@ SHEET_GID = 678851710
 HEADER = 'ID (код)'
 FIRST_ROW = 2
 FREE, VALID, REVOKED = 'Свободен', 'Действителен', 'Отозван'
+_issue_lock = threading.Lock()   # два ментора не должны занять один код одновременно
 
 
 def oauth_creds():
@@ -75,23 +77,40 @@ class ApiSheet:
                     return [v['userEnteredValue'] for v in cond.get('values', [])]
         return sorted({v.strip() for v in self.ws.col_values(3)[1:] if v.strip()})
 
-    def issue(self, fio, course, issued_on, mentor='', letter=False):
-        for i, row in enumerate(self._rows()):
-            row = row + [''] * (9 - len(row))
-            code, name, status = row[0].strip(), row[1].strip(), row[8].strip()
-            if code and not name and status == FREE:
-                r = FIRST_ROW + i
-                updates = [{'range': f'B{r}', 'values': [[fio]]},
-                           {'range': f'E{r}', 'values': [[True]]},
+    def issue(self, fio, course, issued_on, mentor='', letter=False, attempts=5):
+        """Занимает свободный код под ученика.
+
+        Строка сначала «захватывается» (пишем ФИО и сразу перечитываем): если её
+        успел занять кто-то другой — из бота или руками в таблице, — берём следующую.
+        """
+        with _issue_lock:
+            for _ in range(attempts):
+                row = self._free_row()
+                if not row:
+                    raise RuntimeError('свободных кодов не осталось')
+                r, code = row
+                self.ws.update_acell(f'B{r}', fio)
+                if (self.ws.acell(f'B{r}').value or '').strip() != fio.strip():
+                    continue          # строку перехватили — пробуем следующую
+                updates = [{'range': f'E{r}', 'values': [[True]]},
                            {'range': f'G{r}:I{r}', 'values': [[course, issued_on, VALID]]}]
                 if mentor:
                     updates.append({'range': f'C{r}', 'values': [[mentor]]})
-                if letter:  # L — «Благодарственное письмо» ✓
+                if letter:            # L — «Благодарственное письмо» ✓
                     updates.append({'range': f'L{r}', 'values': [[True]]})
                 self.ws.batch_update(updates, value_input_option='USER_ENTERED')
                 return {'code': code, 'row': r, 'fio': fio,
                         'course': course, 'date': issued_on}
-        raise RuntimeError('свободных кодов не осталось')
+        raise RuntimeError('не удалось занять код: строки разбирают быстрее, попробуйте ещё раз')
+
+    def _free_row(self):
+        """Первая строка с кодом, пустым ФИО и статусом «Свободен»."""
+        for i, row in enumerate(self._rows()):
+            row = row + [''] * (9 - len(row))
+            code, name, status = row[0].strip(), row[1].strip(), row[8].strip()
+            if code and not name and status == FREE:
+                return FIRST_ROW + i, code
+        return None
 
     def stats(self):
         st = [(r[8].strip() if len(r) > 8 else '') for r in self._rows()]
