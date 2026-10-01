@@ -49,7 +49,7 @@ requirements.txt      зависимости
 email_templates.json  тексты писем (ru/kz/en) и списки курсов для скидки
 apps_script.gs        запасной бэкенд для таблицы, если OAuth недоступен
                       (перед установкой подставить секрет из APPS_SCRIPT_SECRET)
-deploy/               юнит systemd для сервера
+deploy/               автозапуск: launchd для macOS, systemd для Linux
 templates/            чистые PNG-шаблоны 2000×1425 (казахская благодарность 2000×1414)
 out/                  готовые файлы и QR (создаётся автоматически)
 issued.csv            журнал выдач: код, ФИО, курс, дата
@@ -267,7 +267,47 @@ caffeinate -i .venv/bin/python cert_bot.py
 
 ---
 
-## Развёртывание на сервере
+## Развёртывание на Mac mini (текущий рабочий вариант)
+
+Бот работает на Mac mini «Aibat» под пользователем `capeducation`, папка `~/cap-bot`,
+автозапуск через launchd — поднимается после перезагрузки и после сбоя.
+
+```bash
+ssh macmini
+git clone https://github.com/Amirkapasov/cap-certificates-bot.git ~/cap-bot
+cd ~/cap-bot && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+```
+
+Доступы (`.env`, `credentials.json`, `token.json`) переносятся с рабочей машины, в git их нет:
+
+```bash
+scp .env credentials.json token.json macmini:~/cap-bot/
+ssh macmini 'cd ~/cap-bot && chmod 600 .env credentials.json token.json && .venv/bin/python check.py'
+```
+
+Автозапуск:
+
+```bash
+scp deploy/kz.capedu.certbot.plist macmini:~/Library/LaunchAgents/
+ssh macmini 'launchctl load ~/Library/LaunchAgents/kz.capedu.certbot.plist'
+```
+
+Управление:
+
+| Задача | Команда (через `ssh macmini`) |
+|---|---|
+| Проверить | `pgrep -fl cert_bot.py` |
+| Логи | `tail -f ~/cap-bot/logs/bot.log` |
+| Остановить | `launchctl unload ~/Library/LaunchAgents/kz.capedu.certbot.plist` |
+| Запустить | `launchctl load ~/Library/LaunchAgents/kz.capedu.certbot.plist` |
+| Обновить версию | `cd ~/cap-bot && git pull && launchctl kickstart -k gui/$(id -u)/kz.capedu.certbot` |
+
+Бот должен работать только в одном месте: при запуске на Mac mini останови локальный
+(`pkill -f cert_bot.py`), иначе Telegram будет отдавать сообщения то одному, то другому.
+
+---
+
+## Развёртывание на Linux-сервере
 
 Бот должен работать **в одном экземпляре**: Telegram не отдаёт обновления двум
 процессам сразу. Перед запуском на сервере остановите локальный (`pkill -f cert_bot.py`).
