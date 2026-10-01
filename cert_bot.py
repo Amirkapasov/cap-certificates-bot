@@ -8,6 +8,7 @@
 Без подключённой таблицы код вводится вручную: «CAP-XXXXXX Ученик / Родитель».
 """
 import glob
+import itertools
 import os
 import re
 import time
@@ -52,7 +53,8 @@ TPL = CFG['templates']
 BONUS = [k for k, t in TPL.items() if t.get('bonus')]
 HIDDEN = set(CFG.get('mentors_hidden', []))  # бывшие менторы: в таблице остаются, в кнопках нет
 state = {}    # chat_id -> {'tpl', 'step', 'mentor', 'bonus': set()}
-pending = {}  # id пакета -> что отправить на почту (ждёт подтверждения)
+pending = {}   # id пакета -> что отправить на почту (ждёт подтверждения)
+_pack_seq = itertools.count(1)  # номера не переиспользуются, иначе письма затирают друг друга
 
 
 # ---------- служебное ----------
@@ -196,7 +198,8 @@ def start(message):
            '(почта не обязательна — без неё файлы придут только сюда)\n\n')
         + ('/stats — сколько кодов свободно\n'
            '/revoke CAP-XXXXXX — отозвать сертификат\n'
-           '/resend CAP-XXXXXX — прислать готовый сертификат ещё раз'
+           '/resend CAP-XXXXXX — прислать готовый сертификат ещё раз\n'
+           '/mail CAP-XXXXXX — дослать письмо родителю'
            if USE_SHEET else
            'Таблица не подключена — перед ФИО укажите свободный код:\n'
            'CAP-FYBFYC Иванов Иван / Иванова Мария / mama@gmail.com\n\n'
@@ -270,6 +273,56 @@ def crm_lookup(message):
     bot.send_message(message.chat.id, '\n\n'.join(
         f'{c["student"]}\nРодитель: {c["parent"] or "—"}\nПочта: {c["email"] or "—"}\n'
         f'Телефон: {c["phone"] or "—"}' for c in found[:5]))
+
+
+@bot.message_handler(commands=['mail'])
+def mail_again(message):
+    """Отправить письмо по уже выданному коду: /mail CAP-XXXXXX [почта]"""
+    if not allowed(message.chat.id):
+        return
+    m = CODE_RE.search(message.text)
+    if not m:
+        bot.send_message(message.chat.id, 'Используйте: /mail CAP-XXXXXX [почта@mail.com]')
+        return
+    code = m.group(0).upper()
+    files = sorted(glob.glob(f'out/sert_*_{code}.png'), key=os.path.getmtime)
+    if not files:
+        bot.send_message(message.chat.id, f'Файлов для {code} нет — выдайте сертификат заново.')
+        return
+
+    rec = next((r.split(';') for r in reversed(open(LOG, encoding='utf-8').read().splitlines())
+                if r.startswith(code + ';')), None)
+    if not rec:
+        bot.send_message(message.chat.id, f'{code} нет в журнале выдач.')
+        return
+    _, student, course, day = rec[0], rec[1], rec[2], rec[3]
+
+    em = mailer.EMAIL_RE.search(message.text)
+    email, parent = (em.group(0) if em else ''), ''
+    if not email and USE_CRM:
+        try:
+            found = crm.find(student)
+            if len(found) == 1:
+                email, parent = found[0]['email'], found[0]['parent']
+        except Exception as e:
+            bot.send_message(message.chat.id, f'CRM недоступна: {e}')
+    if not email:
+        bot.send_message(message.chat.id, f'Не знаю почту для «{student}». '
+                                          f'Укажите: /mail {code} почта@mail.com')
+        return
+
+    key = next((k for k, t in TPL.items() if t.get('course') == course), None)
+    lang = TPL.get(key, {}).get('lang', 'ru')
+    letter_key = TPL.get(key, {}).get('letter')
+    items = [('sert', course)]
+    if parent and letter_key:
+        path = f'out/{letter_key}_{_safe(parent)}.png'
+        if os.path.exists(path):
+            files.append(path)
+            items.append(('blago', course))
+    offer_email(message.chat.id, {'email': email, 'student': student, 'parent': parent,
+                                  'course': course, 'lang': lang, 'files': files,
+                                  'items': items, 'links': [qr.verify_link(code)]})
 
 
 @bot.message_handler(commands=['log'])
@@ -367,7 +420,7 @@ def toggle_bonus(call):
 
 def offer_email(chat_id, pack):
     """Показываем, что уйдёт на почту, и ждём подтверждения."""
-    pack_id = str(len(pending) + 1)
+    pack_id = str(next(_pack_seq))
     pending[pack_id] = pack
     subject, body = mailer.build_text(pack['lang'], pack['student'], pack['course'],
                                       pack['items'], pack['links'])
@@ -387,7 +440,9 @@ def send_email(call):
     action, pack_id = call.data.split(':', 1)
     pack = pending.pop(pack_id, None)
     if not pack:
-        bot.send_message(chat_id, 'Это письмо уже обработано.')
+        bot.send_message(chat_id, 'Это письмо уже отправлено, отменено или бот перезапускался.\n'
+                                  'Дослать: /mail CAP-XXXXXX (адрес возьму из CRM) '
+                                  'или /mail CAP-XXXXXX почта@mail.com')
         return
     if action == 'nomail':
         bot.send_message(chat_id, f'Не отправлено ({pack["student"]}).')
