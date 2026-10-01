@@ -17,6 +17,13 @@ LOG = os.path.join(BASE, 'emails.csv')
 EMAIL_RE = re.compile(r'[\w.+-]+@[\w-]+\.[\w.-]+')
 
 
+def addresses(to):
+    """Все адреса из строки или списка: «a@b.kz, c@d.kz» -> [a@b.kz, c@d.kz]."""
+    if isinstance(to, str):
+        return EMAIL_RE.findall(to)
+    return [a for item in to for a in EMAIL_RE.findall(str(item))]
+
+
 def load_templates():
     with open(TEMPLATES, encoding='utf-8') as f:
         return json.load(f)
@@ -59,8 +66,9 @@ def build_text(lang, student, course, items, links):
 
 
 def make_message(to, subject, body, files, sender='me'):
+    """to — один адрес или несколько (списком либо через запятую)."""
     msg = EmailMessage()
-    msg['To'] = to
+    msg['To'] = ', '.join(addresses(to))
     msg['Subject'] = subject
     msg.set_content(body)
     for path in files:
@@ -80,7 +88,7 @@ def send(to, subject, body, files):
     msg = make_message(to, subject, body, files)
     raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
     service.users().messages().send(userId='me', body={'raw': raw}).execute()
-    log(to, subject)
+    log(', '.join(addresses(to)), subject)
 
 
 def log(to, subject):

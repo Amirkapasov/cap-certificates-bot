@@ -191,7 +191,8 @@ def start(message):
         '(+ бонусные сертификаты по желанию).\n\n'
         + ('Достаточно ФИО ученика — родителя и почту бот возьмёт из CRM:\n'
            'Иванов Иван\n'
-           'Можно указать и вручную: Иванов Иван / Иванова Мария / mama@gmail.com\n'
+           'Можно указать и вручную, адресов хоть несколько:\n'
+           'Иванов Иван / Иванова Мария / mama@gmail.com, papa@gmail.com\n'
            '/crm Фамилия Имя — проверить, что есть в CRM\n\n'
            if USE_CRM else
            'ФИО пишется так:\nИванов Иван / Иванова Мария / mama@gmail.com\n'
@@ -297,13 +298,15 @@ def mail_again(message):
         return
     _, student, course, day = rec[0], rec[1], rec[2], rec[3]
 
-    em = mailer.EMAIL_RE.search(message.text)
-    email, parent = (em.group(0) if em else ''), ''
-    if not email and USE_CRM:
+    email = ', '.join(mailer.EMAIL_RE.findall(message.text))
+    parent = ''
+    if USE_CRM:
         try:
             found = crm.find(student)
             if len(found) == 1:
-                email, parent = found[0]['email'], found[0]['parent']
+                parent = found[0]['parent']
+                if found[0]['email'] and found[0]['email'] not in email:
+                    email = ', '.join(x for x in (email, found[0]['email']) if x)
         except Exception as e:
             bot.send_message(message.chat.id, f'CRM недоступна: {e}')
     if not email:
@@ -494,10 +497,10 @@ def parse_line(line):
     m = CODE_RE.search(line)
     code = m.group(0).upper() if m else None
     rest = CODE_RE.sub('', line).strip(' \t:,.')
-    e = mailer.EMAIL_RE.search(rest)
-    email = e.group(0) if e else ''
-    if e:
-        rest = (rest[:e.start()] + ' ' + rest[e.end():])
+    emails = mailer.EMAIL_RE.findall(rest)
+    email = ', '.join(emails)
+    for found in emails:
+        rest = rest.replace(found, ' ')
     parts = [p.strip(' -—–/;,') for p in PARENT_SPLIT.split(rest.strip(), maxsplit=1)]
     student = parts[0]
     parent = parts[1] if len(parts) > 1 else ''
@@ -538,7 +541,8 @@ def issue_sert(chat_id, lines, st):
                 c = found[0]
                 student = c['student'] or student
                 parent = parent or c['parent']
-                email = email or c['email']
+                if c['email'] and c['email'] not in email:
+                    email = ', '.join(x for x in (email, c['email']) if x)
                 bot.send_message(chat_id, f'CRM: {student}\nРодитель: {parent or "—"}\n'
                                           f'Почта: {email or "—"}')
             else:
