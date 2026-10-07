@@ -18,7 +18,8 @@ PERIOD = int(os.getenv('MONITOR_HOURS', '4')) * 3600
 # обрывы связи — не поломка: бот переподключается сам, считаем их отдельно
 NETWORK = re.compile(r'ReadTimeout|ConnectionError|ConnectionReset|NameResolution|MaxRetry'
                      r'|Connection aborted|Connection reset|Broken pipe|Errno 54|Errno 8'
-                     r'|Temporary failure|timed out|ProtocolError|RemoteDisconnected', re.I)
+                     r'|Temporary failure|timed out|ProtocolError|RemoteDisconnected'
+                     r'|No route to host|Network is unreachable|Errno 65|Errno 51', re.I)
 NOISE = re.compile(r'^\s*(raise |self\.|return |during handling|the above exception'
                    r'|traceback \(most recent|file ")', re.I)
 
