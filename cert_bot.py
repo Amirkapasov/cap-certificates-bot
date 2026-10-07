@@ -20,6 +20,7 @@ from telebot import apihelper, types
 
 import crm
 import mailer
+import monitor
 import qr
 import sheets
 from render import load_config, render
@@ -43,6 +44,7 @@ USE_CRM = crm.enabled()               # подтягивать родителя 
 CODE_RE = re.compile(r'CAP-[A-Z0-9]{6}', re.I)
 PARENT_SPLIT = re.compile(r'\s*/\s*|\s*;\s*|\s+[—–-]\s+')  # «Ученик / Родитель»
 LOG = 'issued.csv'
+LOG_FILE = next((p for p in ('logs/bot.log', 'bot.log') if os.path.exists(p)), 'logs/bot.log')
 KZ_TO_RU = str.maketrans('әғқңөұүһіё', 'агкноуухие')
 
 apihelper.CONNECT_TIMEOUT = 30   # при слабом интернете картинки грузятся дольше
@@ -326,6 +328,30 @@ def mail_again(message):
     offer_email(message.chat.id, {'email': email, 'student': student, 'parent': parent,
                                   'course': course, 'lang': lang, 'files': files,
                                   'items': items, 'links': [qr.verify_link(code)]})
+
+
+@bot.message_handler(commands=['monitoring', 'status'])
+def monitoring(message):
+    bot.send_message(message.chat.id, monitor.status(sheet, LOG_FILE))
+
+
+@bot.message_handler(commands=['monitor_here'])
+def monitor_here(message):
+    if not allowed(message.chat.id):
+        return
+    monitor.set_chat(message.chat.id)
+    bot.send_message(message.chat.id,
+                     f'Буду присылать сюда отчёт о работе каждые '
+                     f'{monitor.PERIOD // 3600} ч, а также при каждом перезапуске.\n'
+                     f'Выключить: /monitor_off')
+
+
+@bot.message_handler(commands=['monitor_off'])
+def monitor_off(message):
+    if not allowed(message.chat.id):
+        return
+    monitor.set_chat(0)
+    bot.send_message(message.chat.id, 'Отчёты отключены. Включить снова: /monitor_here')
 
 
 @bot.message_handler(commands=['log'])
@@ -648,10 +674,18 @@ def flow(message):
     except Exception as e:
         traceback.print_exc()
         bot.send_message(chat_id, f'Ошибка: {e}')
+        target = monitor.chat_id()
+        if target and target != chat_id:
+            try:
+                bot.send_message(target, f'❌ Ошибка у пользователя {chat_id}: {e}')
+            except Exception:
+                pass
 
 
 if __name__ == '__main__':
     if not TOKEN:
         raise SystemExit('Задайте CERT_BOT_TOKEN в .env')
     print('bot started')
+    monitor.notify_start(bot, LOG_FILE)
+    monitor.start_heartbeat(bot, sheet, LOG_FILE)
     bot.infinity_polling()
